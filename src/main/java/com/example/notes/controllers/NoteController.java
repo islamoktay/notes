@@ -6,6 +6,7 @@ import com.example.notes.services.NoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -26,8 +27,8 @@ public class NoteController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> saveNote(@RequestBody NoteRequest noteRequest) {
-        noteService.saveNote(noteRequest);
-        return ResponseEntity.status(201).build();
+    public ResponseEntity<NoteResponse> saveNote(@Valid @RequestBody NoteRequest noteRequest) {
+        NoteResponse savedNote = noteService.saveNote(noteRequest);
+        return ResponseEntity.status(201).body(savedNote);
     }
 }

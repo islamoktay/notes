@@ -2,10 +2,10 @@ package com.example.notes.controllers;
 
 import com.example.notes.dtos.UserRequest;
 import com.example.notes.dtos.UserResponse;
-import com.example.notes.entities.User;
 import com.example.notes.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class UserController {
     }
 
     @PostMapping
-    public void addUser(@RequestBody UserRequest user) {
-        userService.addUser(user);
+    public UserResponse addUser(@Valid @RequestBody UserRequest user) {
+        return userService.addUser(user);
     }
 }

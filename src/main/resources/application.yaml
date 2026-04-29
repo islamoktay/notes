@@ -1,6 +1,6 @@
 spring:
   application:
-    name: products
+    name: notes
   datasource:
     url: jdbc:postgresql://localhost:5432/notes
     username:
