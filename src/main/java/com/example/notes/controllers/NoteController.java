@@ -4,6 +4,7 @@ import com.example.notes.dtos.NoteRequest;
 import com.example.notes.dtos.NoteResponse;
 import com.example.notes.services.NoteService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -17,24 +18,28 @@ import java.util.List;
 @RequestMapping(path = "api/v1/notes")
 @RequiredArgsConstructor
 @Tag(name = "Notes", description = "Endpoints for creating and retrieving notes")
+@Slf4j
 public class NoteController {
     private final NoteService noteService;
 
     @GetMapping
     @Operation(summary = "Get all notes", description = "Returns a list of all notes in the system")
     public List<NoteResponse> getNotes() {
+        log.info("REST request to get all notes");
         return noteService.getNotes();
     }
 
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get notes by User ID", description = "Returns all notes belonging to a specific user")
     public List<NoteResponse> getUserNotes(@PathVariable Long userId) {
+        log.info("REST request to get notes for user: {}", userId);
         return noteService.getUserNotes(userId);
     }
 
     @PostMapping
     @Operation(summary = "Create a new note", description = "Saves a new note and connects it to a user")
     public ResponseEntity<NoteResponse> saveNote(@Valid @RequestBody NoteRequest noteRequest) {
+        log.info("REST request to save note: {}", noteRequest.title());
         NoteResponse savedNote = noteService.saveNote(noteRequest);
         return ResponseEntity.status(201).body(savedNote);
     }

@@ -19,8 +19,8 @@ This roadmap is designed to take this "Notes App" from a simple project to a pro
 
 ## 🏗 Phase 3: Quality & Visibility (NEXT STEPS)
 - ✅ **Automated Testing:** Learning JUnit 5 and Mockito. (Crucial for job interviews).
-- **API Documentation:** Implementing Swagger/OpenAPI so you have a UI to test your API.
-- **Logging:** Adding SLF4J/Logback to see what's happening inside your app while it's running.
+- ✅ **API Documentation:** Implementing Swagger/OpenAPI so you have a UI to test your API.
+- ✅ **Logging:** Adding SLF4J/Logback to see what's happening inside your app while it's running.
 - **Professional Error Design:** Moving beyond basic strings to structured Error Codes and a consistent API response wrapper.
 
 ## 📈 Phase 4: Intermediate Features
