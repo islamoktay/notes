@@ -2,6 +2,9 @@
 
 This roadmap is designed to take this "Notes App" from a simple project to a professional-grade, production-ready application.
 
+> [!NOTE]
+> **Educational Focus:** Every step in this roadmap includes detailed explanations of *why* we use certain patterns and *how* they work, tailored for someone new to backend development.
+
 ## ✅ Phase 1: The Foundation (COMPLETED)
 - **Layered Architecture:** Understanding Controllers, Services, and Repositories.
 - **DTO Pattern:** Separating API data from Database data.
