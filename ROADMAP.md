@@ -6,19 +6,19 @@ This roadmap is designed to take this "Notes App" from a simple project to a pro
 > **Educational Focus:** Every step in this roadmap includes detailed explanations of *why* we use certain patterns and *how* they work, tailored for someone new to backend development.
 
 ## ✅ Phase 1: The Foundation (COMPLETED)
-- **Layered Architecture:** Understanding Controllers, Services, and Repositories.
-- **DTO Pattern:** Separating API data from Database data.
-- **Mappers:** Decoupling conversion logic from business logic.
-- **CRUD Operations:** Create, Read, Update, and Delete logic.
+- ✅ **Layered Architecture:** Understanding Controllers, Services, and Repositories.
+- ✅ **DTO Pattern:** Separating API data from Database data.
+- ✅ **Mappers:** Decoupling conversion logic from business logic.
+- ✅ **CRUD Operations:** Create, Read, Update, and Delete logic.
 
 ## ✅ Phase 2: Performance & Integrity (COMPLETED)
-- **N+1 Query Problem:** Learning how to use `JOIN FETCH` for database efficiency.
-- **Transactions:** Using `@Transactional` to ensure data safety.
-- **Validation:** Using `@Valid` and Jakarta constraints to protect against bad data.
-- **Global Exception Handling:** Standardizing error responses.
+- ✅ **N+1 Query Problem:** Learning how to use `JOIN FETCH` for database efficiency.
+- ✅ **Transactions:** Using `@Transactional` to ensure data safety.
+- ✅ **Validation:** Using `@Valid` and Jakarta constraints to protect against bad data.
+- ✅ **Global Exception Handling:** Standardizing error responses.
 
 ## 🏗 Phase 3: Quality & Visibility (NEXT STEPS)
-- **Automated Testing:** Learning JUnit 5 and Mockito. (Crucial for job interviews).
+- ✅ **Automated Testing:** Learning JUnit 5 and Mockito. (Crucial for job interviews).
 - **API Documentation:** Implementing Swagger/OpenAPI so you have a UI to test your API.
 - **Logging:** Adding SLF4J/Logback to see what's happening inside your app while it's running.
 - **Professional Error Design:** Moving beyond basic strings to structured Error Codes and a consistent API response wrapper.
