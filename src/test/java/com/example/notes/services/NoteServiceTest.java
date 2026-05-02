@@ -62,7 +62,7 @@ class NoteServiceTest {
         Note savedNote = new Note("Title", "Content");
         savedNote.setId(1L);
         savedNote.setUser(user);
-        NoteResponse response = new NoteResponse(1L, "Title", "Content", 1L);
+        NoteResponse response = new NoteResponse(1L, "Title", "Content", 1L, null, null);
 
         given(noteRepository.save(any(Note.class))).willReturn(savedNote);
         given(noteMapper.toResponse(savedNote)).willReturn(response);

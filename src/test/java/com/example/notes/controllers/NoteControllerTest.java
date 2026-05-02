@@ -52,7 +52,7 @@ class NoteControllerTest {
     @DisplayName("Should return list of notes wrapped in ApiResponse")
     void getNotes_Success() throws Exception {
         // GIVEN
-        NoteResponse note = new NoteResponse(1L, "Title", "Content", 1L);
+        NoteResponse note = new NoteResponse(1L, "Title", "Content", 1L, null, null);
         given(noteService.getNotes()).willReturn(List.of(note));
 
         // WHEN & THEN
@@ -68,7 +68,7 @@ class NoteControllerTest {
     void saveNote_Success() throws Exception {
         // GIVEN
         NoteRequest request = new NoteRequest("New Note", "Some content", 1L);
-        NoteResponse response = new NoteResponse(1L, "New Note", "Some content", 1L);
+        NoteResponse response = new NoteResponse(1L, "New Note", "Some content", 1L, null, null);
         
         given(noteService.saveNote(any(NoteRequest.class))).willReturn(response);
 

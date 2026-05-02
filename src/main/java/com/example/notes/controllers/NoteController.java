@@ -25,16 +25,16 @@ public class NoteController {
 
     @GetMapping
     @Operation(summary = "Get all notes", description = "Returns a list of all notes in the system")
-    public ApiResponse<List<NoteResponse>> getNotes() {
+    public ResponseEntity<ApiResponse<List<NoteResponse>>> getNotes() {
         log.info("REST request to get all notes");
-        return ApiResponse.success(noteService.getNotes());
+        return ResponseEntity.ok(ApiResponse.success(noteService.getNotes()));
     }
 
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get notes by User ID", description = "Returns all notes belonging to a specific user")
-    public ApiResponse<List<NoteResponse>> getUserNotes(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<List<NoteResponse>>> getUserNotes(@PathVariable Long userId) {
         log.info("REST request to get notes for user: {}", userId);
-        return ApiResponse.success(noteService.getUserNotes(userId));
+        return ResponseEntity.ok(ApiResponse.success(noteService.getUserNotes(userId)));
     }
 
     @PostMapping

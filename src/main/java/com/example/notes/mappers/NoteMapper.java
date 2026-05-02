@@ -14,7 +14,9 @@ public class NoteMapper {
                 note.getId(),
                 note.getTitle(),
                 note.getContent(),
-                note.getUser() != null ? note.getUser().getId() : null
+                note.getUser() != null ? note.getUser().getId() : null,
+                note.getCreatedAt(),
+                note.getUpdatedAt()
         );
     }
 }

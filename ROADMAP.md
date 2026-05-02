@@ -24,7 +24,7 @@ This roadmap is designed to take this "Notes App" from a simple project to a pro
 - ✅ **Professional Error Design:** Moving beyond basic strings to structured Error Codes and a consistent API response wrapper.
 
 ## 📈 Phase 4: Intermediate Features
-- **JPA Auditing:** Automatically tracking `created_at` and `updated_at` for every note.
+- ✅ **JPA Auditing:** Automatically tracking `created_at` and `updated_at` for every note.
 - **Soft Deletes:** Learning how to mark data as "deleted" without actually removing it from the DB.
 - **Pagination & Sorting:** Handling large amounts of data efficiently.
 - **Advanced Validation:** Cross-field validation and custom validator annotations.

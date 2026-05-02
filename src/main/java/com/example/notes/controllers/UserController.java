@@ -7,6 +7,7 @@ import com.example.notes.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,13 +19,14 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ApiResponse<List<UserResponse>> getUsers() {
-        return ApiResponse.success(userService.getUsers());
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getUsers() {
+        return ResponseEntity.ok(ApiResponse.success(userService.getUsers()));
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<UserResponse> addUser(@Valid @RequestBody UserRequest user) {
-        return ApiResponse.success(userService.addUser(user), "User created successfully");
+    public ResponseEntity<ApiResponse<UserResponse>> addUser(@Valid @RequestBody UserRequest user) {
+        UserResponse savedUser = userService.addUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(savedUser, "User created successfully"));
     }
 }
