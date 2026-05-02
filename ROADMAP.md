@@ -21,13 +21,14 @@ This roadmap is designed to take this "Notes App" from a simple project to a pro
 - ✅ **Automated Testing:** Learning JUnit 5 and Mockito. (Crucial for job interviews).
 - ✅ **API Documentation:** Implementing Swagger/OpenAPI so you have a UI to test your API.
 - ✅ **Logging:** Adding SLF4J/Logback to see what's happening inside your app while it's running.
-- **Professional Error Design:** Moving beyond basic strings to structured Error Codes and a consistent API response wrapper.
+- ✅ **Professional Error Design:** Moving beyond basic strings to structured Error Codes and a consistent API response wrapper.
 
 ## 📈 Phase 4: Intermediate Features
 - **JPA Auditing:** Automatically tracking `created_at` and `updated_at` for every note.
 - **Soft Deletes:** Learning how to mark data as "deleted" without actually removing it from the DB.
 - **Pagination & Sorting:** Handling large amounts of data efficiently.
 - **Advanced Validation:** Cross-field validation and custom validator annotations.
+- **Localization (i18n):** Translating error messages and API responses based on user locale.
 - **API Versioning:** Learning different strategies (URI, Header, Media Type) to evolve your API without breaking clients.
 
 ## 🔒 Phase 5: Security (The Big Leap)

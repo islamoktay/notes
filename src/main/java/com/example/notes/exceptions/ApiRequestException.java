@@ -1,11 +1,11 @@
 package com.example.notes.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+public class ApiRequestException extends BaseException {
+    public ApiRequestException(ErrorCode errorCode) {
+        super(errorCode);
+    }
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class ApiRequestException extends RuntimeException {
-    public ApiRequestException(String message) {
-        super(message);
+    public ApiRequestException(ErrorCode errorCode, String message) {
+        super(errorCode, message);
     }
 }

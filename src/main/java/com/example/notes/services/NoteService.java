@@ -4,7 +4,8 @@ import com.example.notes.dtos.NoteRequest;
 import com.example.notes.dtos.NoteResponse;
 import com.example.notes.entities.Note;
 import com.example.notes.entities.User;
-import com.example.notes.exceptions.ApiRequestException;
+import com.example.notes.exceptions.ErrorCode;
+import com.example.notes.exceptions.ResourceNotFoundException;
 import com.example.notes.mappers.NoteMapper;
 import com.example.notes.repositories.NoteRepository;
 import com.example.notes.repositories.UserRepository;
@@ -37,7 +38,7 @@ public class NoteService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> {
                     log.warn("Attempted to fetch notes for non-existing user ID: {}", userId);
-                    return new ApiRequestException("User not found");
+                    return new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND);
                 });
 
         return user.getNotes().stream()
@@ -51,7 +52,7 @@ public class NoteService {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> {
                     log.warn("Cannot save note: User ID {} not found", request.userId());
-                    return new ApiRequestException("User not found");
+                    return new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND);
                 });
 
         Note note = new Note(request.title(), request.content());
