@@ -2,17 +2,19 @@ package com.example.notes.controllers;
 
 import com.example.notes.dtos.NoteRequest;
 import com.example.notes.dtos.NoteResponse;
+import com.example.notes.dtos.PageResponse;
 import com.example.notes.exceptions.ErrorCode;
 import com.example.notes.exceptions.ResourceNotFoundException;
 import com.example.notes.services.NoteService;
-import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -25,16 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * 🎓 Educational Note: Controller Testing with @WebMvcTest
- * 
- * This tests the "Web Layer" (Controllers, Routing, JSON conversion).
- * 
- * - `@WebMvcTest` does NOT start the whole server. It only starts the web part.
- * - We use `MockMvc` to "fake" HTTP requests to our API.
- * - We mock the Service layer because we already tested it in NoteServiceTest.
- * 
- * 🚀 Professional Addition: Structured Responses
- * - We now verify that our data is wrapped in a consistent "ApiResponse" object.
- * - We check for "$.success" and "$.data" instead of looking at the root level.
  */
 @WebMvcTest(NoteController.class)
 class NoteControllerTest {
@@ -49,18 +41,20 @@ class NoteControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("Should return list of notes wrapped in ApiResponse")
+    @DisplayName("Should return paginated list of notes wrapped in ApiResponse")
     void getNotes_Success() throws Exception {
         // GIVEN
         NoteResponse note = new NoteResponse(1L, "Title", "Content", 1L, null, null);
-        given(noteService.getNotes()).willReturn(List.of(note));
+        PageResponse<NoteResponse> pageResponse = new PageResponse<>(List.of(note), 0, 10, 1, 1, true);
+        given(noteService.getNotes(any(Pageable.class))).willReturn(pageResponse);
 
         // WHEN & THEN
         mockMvc.perform(get("/api/v1/notes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data[0].title").value("Title"))
-                .andExpect(jsonPath("$.data[0].content").value("Content"));
+                .andExpect(jsonPath("$.data.content[0].title").value("Title"))
+                .andExpect(jsonPath("$.data.content[0].content").value("Content"))
+                .andExpect(jsonPath("$.data.totalElements").value(1));
     }
 
     @Test
@@ -101,7 +95,7 @@ class NoteControllerTest {
     @DisplayName("Should return structured error response when user is not found")
     void getUserNotes_UserNotFound() throws Exception {
         // GIVEN
-        given(noteService.getUserNotes(99L))
+        given(noteService.getUserNotes(any(Long.class), any(Pageable.class)))
                 .willThrow(new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         // WHEN & THEN

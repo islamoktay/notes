@@ -2,6 +2,7 @@ package com.example.notes.services;
 
 import com.example.notes.dtos.NoteRequest;
 import com.example.notes.dtos.NoteResponse;
+import com.example.notes.dtos.PageResponse;
 import com.example.notes.entities.Note;
 import com.example.notes.entities.User;
 import com.example.notes.exceptions.ResourceNotFoundException;
@@ -14,7 +15,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,6 +55,29 @@ class NoteServiceTest {
 
     @InjectMocks
     private NoteService noteService;
+
+    @Test
+    @DisplayName("Should fetch paginated notes successfully")
+    void getNotes_Success() {
+        // GIVEN
+        Pageable pageable = PageRequest.of(0, 10);
+        Note note = new Note("Title", "Content");
+        Page<Note> notePage = new PageImpl<>(List.of(note));
+        NoteResponse response = new NoteResponse(1L, "Title", "Content", 1L, null, null);
+        PageResponse<NoteResponse> pageResponse = new PageResponse<>(List.of(response), 0, 10, 1, 1, true);
+        
+        given(noteRepository.findAllByDeletedFalse(pageable)).willReturn(notePage);
+        given(noteMapper.toResponsePage(notePage)).willReturn(pageResponse);
+
+        // WHEN
+        PageResponse<NoteResponse> result = noteService.getNotes(pageable);
+
+        // THEN
+        assertThat(result.content()).hasSize(1);
+        assertThat(result.totalElements()).isEqualTo(1);
+        verify(noteRepository).findAllByDeletedFalse(pageable);
+        verify(noteMapper).toResponsePage(notePage);
+    }
 
     @Test
     @DisplayName("Should save note successfully when user exists")

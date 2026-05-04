@@ -3,17 +3,18 @@ package com.example.notes.controllers;
 import com.example.notes.dtos.ApiResponse;
 import com.example.notes.dtos.NoteRequest;
 import com.example.notes.dtos.NoteResponse;
+import com.example.notes.dtos.PageResponse;
 import com.example.notes.services.NoteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "api/v1/notes")
@@ -24,17 +25,25 @@ public class NoteController {
     private final NoteService noteService;
 
     @GetMapping
-    @Operation(summary = "Get all notes", description = "Returns a list of all notes in the system")
-    public ResponseEntity<ApiResponse<List<NoteResponse>>> getNotes() {
-        log.info("REST request to get all notes");
-        return ResponseEntity.ok(ApiResponse.success(noteService.getNotes()));
+    @Operation(
+        summary = "Get all notes", 
+        description = "Returns a paginated list of all notes. Sortable fields: id, title, createdAt, updatedAt"
+    )
+    public ResponseEntity<ApiResponse<PageResponse<NoteResponse>>> getNotes(@ParameterObject Pageable pageable) {
+        log.info("REST request to get all notes (paginated)");
+        return ResponseEntity.ok(ApiResponse.success(noteService.getNotes(pageable)));
     }
 
     @GetMapping("/user/{userId}")
-    @Operation(summary = "Get notes by User ID", description = "Returns all notes belonging to a specific user")
-    public ResponseEntity<ApiResponse<List<NoteResponse>>> getUserNotes(@PathVariable Long userId) {
-        log.info("REST request to get notes for user: {}", userId);
-        return ResponseEntity.ok(ApiResponse.success(noteService.getUserNotes(userId)));
+    @Operation(
+        summary = "Get notes by User ID", 
+        description = "Returns a paginated list of notes for a specific user. Sortable fields: id, title, createdAt, updatedAt"
+    )
+    public ResponseEntity<ApiResponse<PageResponse<NoteResponse>>> getUserNotes(
+            @PathVariable Long userId, 
+            @ParameterObject Pageable pageable) {
+        log.info("REST request to get notes for user: {} (paginated)", userId);
+        return ResponseEntity.ok(ApiResponse.success(noteService.getUserNotes(userId, pageable)));
     }
 
     @PostMapping

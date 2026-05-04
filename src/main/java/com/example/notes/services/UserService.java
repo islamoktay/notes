@@ -1,5 +1,6 @@
 package com.example.notes.services;
 
+import com.example.notes.dtos.PageResponse;
 import com.example.notes.dtos.UserRequest;
 import com.example.notes.dtos.UserResponse;
 import com.example.notes.entities.User;
@@ -9,10 +10,10 @@ import com.example.notes.mappers.UserMapper;
 import com.example.notes.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,11 +29,10 @@ public class UserService {
         );
     }
 
-    public List<UserResponse> getUsers() {
-        log.info("Fetching all active users with their active notes");
-        return userRepository.findAllWithNotes().stream()
-                .map(userMapper::toResponse)
-                .toList();
+    public PageResponse<UserResponse> getUsers(Pageable pageable) {
+        log.info("Fetching paginated active users with their active notes");
+        Page<User> userPage = userRepository.findAllWithNotes(pageable);
+        return userMapper.toResponsePage(userPage);
     }
 
     @Transactional

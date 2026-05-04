@@ -2,6 +2,7 @@ package com.example.notes.services;
 
 import com.example.notes.dtos.NoteRequest;
 import com.example.notes.dtos.NoteResponse;
+import com.example.notes.dtos.PageResponse;
 import com.example.notes.entities.Note;
 import com.example.notes.entities.User;
 import com.example.notes.exceptions.ErrorCode;
@@ -11,10 +12,10 @@ import com.example.notes.repositories.NoteRepository;
 import com.example.notes.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,26 +26,22 @@ public class NoteService {
     private final UserRepository userRepository;
     private final NoteMapper noteMapper;
 
-    public List<NoteResponse> getNotes() {
-        log.info("Fetching all active notes from database");
-        return noteRepository.findAllByDeletedFalse()
-                .stream()
-                .map(noteMapper::toResponse)
-                .toList();
+    public PageResponse<NoteResponse> getNotes(Pageable pageable) {
+        log.info("Fetching paginated active notes from database");
+        Page<Note> notePage = noteRepository.findAllByDeletedFalse(pageable);
+        return noteMapper.toResponsePage(notePage);
     }
 
-    public List<NoteResponse> getUserNotes(Long userId) {
-        log.info("Fetching active notes for user ID: {}", userId);
-        User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
-                () -> {
-                    log.warn("Attempted to fetch notes for non-existing or deleted user ID: {}", userId);
-                    return new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND);
-                });
+    public PageResponse<NoteResponse> getUserNotes(Long userId, Pageable pageable) {
+        log.info("Fetching paginated active notes for user ID: {}", userId);
+        
+        if (!userRepository.existsByIdAndDeletedFalse(userId)) {
+            log.warn("Attempted to fetch notes for non-existing or deleted user ID: {}", userId);
+            throw new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND);
+        }
 
-        return user.getNotes().stream()
-                .filter(note -> !note.isDeleted())
-                .map(noteMapper::toResponse)
-                .toList();
+        Page<Note> notePage = noteRepository.findAllByUserIdAndDeletedFalse(userId, pageable);
+        return noteMapper.toResponsePage(notePage);
     }
 
     @Transactional

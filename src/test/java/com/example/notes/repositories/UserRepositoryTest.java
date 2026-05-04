@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -48,8 +50,9 @@ class UserRepositoryTest {
         entityManager.flush();
         entityManager.clear();
 
-        // WHEN: Call the custom query method
-        List<User> users = userRepository.findAllWithNotes();
+        // WHEN: Call the custom query method with pagination
+        Page<User> usersPage = userRepository.findAllWithNotes(PageRequest.of(0, 10));
+        List<User> users = usersPage.getContent();
 
         // THEN: Verify the data was fetched correctly
         assertThat(users).hasSize(1);
