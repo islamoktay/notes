@@ -45,4 +45,12 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(savedNote, "Note created successfully"));
     }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a note", description = "Performs a soft delete on a note")
+    public ResponseEntity<ApiResponse<Void>> deleteNote(@PathVariable Long id) {
+        log.info("REST request to delete note: {}", id);
+        noteService.deleteNote(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "Note deleted successfully"));
+    }
 }

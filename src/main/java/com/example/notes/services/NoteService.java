@@ -26,22 +26,23 @@ public class NoteService {
     private final NoteMapper noteMapper;
 
     public List<NoteResponse> getNotes() {
-        log.info("Fetching all notes from database");
-        return noteRepository.findAll()
+        log.info("Fetching all active notes from database");
+        return noteRepository.findAllByDeletedFalse()
                 .stream()
                 .map(noteMapper::toResponse)
                 .toList();
     }
 
     public List<NoteResponse> getUserNotes(Long userId) {
-        log.info("Fetching notes for user ID: {}", userId);
-        User user = userRepository.findById(userId).orElseThrow(
+        log.info("Fetching active notes for user ID: {}", userId);
+        User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
                 () -> {
-                    log.warn("Attempted to fetch notes for non-existing user ID: {}", userId);
+                    log.warn("Attempted to fetch notes for non-existing or deleted user ID: {}", userId);
                     return new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND);
                 });
 
         return user.getNotes().stream()
+                .filter(note -> !note.isDeleted())
                 .map(noteMapper::toResponse)
                 .toList();
     }
@@ -49,9 +50,9 @@ public class NoteService {
     @Transactional
     public NoteResponse saveNote(NoteRequest request) {
         log.info("Saving new note for user ID: {}", request.userId());
-        User user = userRepository.findById(request.userId())
+        User user = userRepository.findByIdAndDeletedFalse(request.userId())
                 .orElseThrow(() -> {
-                    log.warn("Cannot save note: User ID {} not found", request.userId());
+                    log.warn("Cannot save note: User ID {} not found or deleted", request.userId());
                     return new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND);
                 });
 
@@ -61,5 +62,19 @@ public class NoteService {
         Note savedNote = noteRepository.save(note);
         log.info("Successfully saved note with ID: {}", savedNote.getId());
         return noteMapper.toResponse(savedNote);
+    }
+
+    @Transactional
+    public void deleteNote(Long id) {
+        log.info("Deleting note with ID: {}", id);
+        Note note = noteRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> {
+                    log.warn("Cannot delete note: ID {} not found or already deleted", id);
+                    return new ResourceNotFoundException(ErrorCode.NOTE_NOT_FOUND);
+                });
+        
+        note.setDeleted(true);
+        noteRepository.save(note);
+        log.info("Successfully manually soft-deleted note with ID: {}", id);
     }
 }

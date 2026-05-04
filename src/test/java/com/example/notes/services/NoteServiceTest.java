@@ -57,7 +57,7 @@ class NoteServiceTest {
         User user = new User("John Doe");
         user.setId(1L);
 
-        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(userRepository.findByIdAndDeletedFalse(1L)).willReturn(Optional.of(user));
 
         Note savedNote = new Note("Title", "Content");
         savedNote.setId(1L);
@@ -79,7 +79,7 @@ class NoteServiceTest {
     void saveNote_UserNotFound() {
         // GIVEN
         NoteRequest request = new NoteRequest("Title", "Content", 99L);
-        given(userRepository.findById(99L)).willReturn(Optional.empty());
+        given(userRepository.findByIdAndDeletedFalse(99L)).willReturn(Optional.empty());
 
         // WHEN & THEN
         assertThatThrownBy(() -> noteService.saveNote(request))
