@@ -66,7 +66,7 @@ class NoteServiceTest {
         NoteResponse response = new NoteResponse(1L, "Title", "Content", 1L, null, null);
         PageResponse<NoteResponse> pageResponse = new PageResponse<>(List.of(response), 0, 10, 1, 1, true);
         
-        given(noteRepository.findAllByDeletedFalse(pageable)).willReturn(notePage);
+        given(noteRepository.findAll(pageable)).willReturn(notePage);
         given(noteMapper.toResponsePage(notePage)).willReturn(pageResponse);
 
         // WHEN
@@ -75,7 +75,7 @@ class NoteServiceTest {
         // THEN
         assertThat(result.content()).hasSize(1);
         assertThat(result.totalElements()).isEqualTo(1);
-        verify(noteRepository).findAllByDeletedFalse(pageable);
+        verify(noteRepository).findAll(pageable);
         verify(noteMapper).toResponsePage(notePage);
     }
 
@@ -86,7 +86,7 @@ class NoteServiceTest {
         User user = new User("John Doe");
         user.setId(1L);
 
-        given(userRepository.findByIdAndDeletedFalse(1L)).willReturn(Optional.of(user));
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
 
         Note savedNote = new Note("Title", "Content");
         savedNote.setId(1L);
@@ -108,7 +108,7 @@ class NoteServiceTest {
     void saveNote_UserNotFound() {
         // GIVEN
         NoteRequest request = new NoteRequest("Title", "Content", 99L);
-        given(userRepository.findByIdAndDeletedFalse(99L)).willReturn(Optional.empty());
+        given(userRepository.findById(99L)).willReturn(Optional.empty());
 
         // WHEN & THEN
         assertThatThrownBy(() -> noteService.saveNote(request))

@@ -8,6 +8,7 @@ public enum ErrorCode {
     // 400 - Bad Request
     INVALID_INPUT("INVALID_INPUT", "The input data is invalid", HttpStatus.BAD_REQUEST),
     VALIDATION_FAILED("VALIDATION_FAILED", "Validation failed for one or more fields", HttpStatus.BAD_REQUEST),
+    INVALID_SORT_FIELD("INVALID_SORT_FIELD", "The specified sort field is not valid", HttpStatus.BAD_REQUEST),
     
     // 404 - Not Found
     USER_NOT_FOUND("USER_NOT_FOUND", "The requested user was not found", HttpStatus.NOT_FOUND),

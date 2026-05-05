@@ -1,6 +1,7 @@
 package com.example.notes.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -47,6 +48,20 @@ public class GlobalExceptionHandler {
                 errors
         );
 
+        return new ResponseEntity<>(response, errorCode.getHttpStatus());
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ApiErrorResponse> handlePropertyReferenceException(PropertyReferenceException e) {
+        log.warn("Invalid sort field requested: {}", e.getPropertyName());
+        
+        ErrorCode errorCode = ErrorCode.INVALID_SORT_FIELD;
+        ApiErrorResponse response = ApiErrorResponse.of(
+                errorCode,
+                String.format("No property '%s' found. Please use a valid sortable field.", e.getPropertyName()),
+                errorCode.getHttpStatus().value()
+        );
+        
         return new ResponseEntity<>(response, errorCode.getHttpStatus());
     }
 

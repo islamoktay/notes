@@ -28,26 +28,26 @@ public class NoteService {
 
     public PageResponse<NoteResponse> getNotes(Pageable pageable) {
         log.info("Fetching paginated active notes from database");
-        Page<Note> notePage = noteRepository.findAllByDeletedFalse(pageable);
+        Page<Note> notePage = noteRepository.findAll(pageable);
         return noteMapper.toResponsePage(notePage);
     }
 
     public PageResponse<NoteResponse> getUserNotes(Long userId, Pageable pageable) {
         log.info("Fetching paginated active notes for user ID: {}", userId);
         
-        if (!userRepository.existsByIdAndDeletedFalse(userId)) {
+        if (!userRepository.existsById(userId)) {
             log.warn("Attempted to fetch notes for non-existing or deleted user ID: {}", userId);
             throw new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND);
         }
 
-        Page<Note> notePage = noteRepository.findAllByUserIdAndDeletedFalse(userId, pageable);
+        Page<Note> notePage = noteRepository.findAllByUserId(userId, pageable);
         return noteMapper.toResponsePage(notePage);
     }
 
     @Transactional
     public NoteResponse saveNote(NoteRequest request) {
         log.info("Saving new note for user ID: {}", request.userId());
-        User user = userRepository.findByIdAndDeletedFalse(request.userId())
+        User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> {
                     log.warn("Cannot save note: User ID {} not found or deleted", request.userId());
                     return new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND);
@@ -64,7 +64,7 @@ public class NoteService {
     @Transactional
     public void deleteNote(Long id) {
         log.info("Deleting note with ID: {}", id);
-        Note note = noteRepository.findByIdAndDeletedFalse(id)
+        Note note = noteRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Cannot delete note: ID {} not found or already deleted", id);
                     return new ResourceNotFoundException(ErrorCode.NOTE_NOT_FOUND);
@@ -72,6 +72,6 @@ public class NoteService {
         
         note.setDeleted(true);
         noteRepository.save(note);
-        log.info("Successfully manually soft-deleted note with ID: {}", id);
+        log.info("Successfully soft-deleted note with ID: {}", id);
     }
 }

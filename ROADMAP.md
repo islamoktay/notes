@@ -28,13 +28,13 @@ This roadmap is designed to take this "Notes App" from a simple project to a pro
 - ✅ **Soft Deletes:** Learning how to mark data as "deleted" without actually removing it from the DB.
 - ✅ **Pagination & Sorting:** Handling large amounts of data efficiently.
 - ✅ **Advanced Validation:** Cross-field validation and custom validator annotations.
-- **🚨 Pagination with JOIN FETCH (HIGH PRIORITY):** Removing `JOIN FETCH` from paginated queries to prevent memory leaks (HHH000104).
-- **Cascading Soft Deletes:** Ensuring soft-deleting a parent (User) correctly hides their children (Notes).
-- **Global Soft Delete Filtering:** Replacing manual `findAllByDeletedFalse` with Hibernate `@SQLRestriction` for bulletproof data filtering.
+- ✅ **Pagination with JOIN FETCH:** Removed `JOIN FETCH` from paginated queries to prevent memory leaks (HHH000104).
+- ✅ **Cascading Soft Deletes:** Ensuring soft-deleting a parent (User) correctly hides their children (Notes).
+- ✅ **Global Soft Delete Filtering:** Replaced manual `findAllByDeletedFalse` with Hibernate `@SQLRestriction` for bulletproof data filtering.
 - **Background Tasks & Cleanup:** Using `@Scheduled` for automatic maintenance (e.g., emptying the trash).
 - **Localization (i18n):** Translating error messages and API responses based on user locale.
 - **API Versioning:** Learning different strategies (URI, Header, Media Type) to evolve your API without breaking clients.
-- **Advanced Pagination Handling:** Catching `PropertyReferenceException` to return friendly errors for invalid sort fields.
+- ✅ **Advanced Pagination Handling:** Catching `PropertyReferenceException` to return friendly errors for invalid sort fields.
 
 ## 🔒 Phase 5: Security (The Big Leap)
 - **Spring Security:** Protecting your endpoints.

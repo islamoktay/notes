@@ -30,8 +30,8 @@ public class UserService {
     }
 
     public PageResponse<UserResponse> getUsers(Pageable pageable) {
-        log.info("Fetching paginated active users with their active notes");
-        Page<User> userPage = userRepository.findAllWithNotes(pageable);
+        log.info("Fetching paginated active users");
+        Page<User> userPage = userRepository.findAll(pageable);
         return userMapper.toResponsePage(userPage);
     }
 
@@ -43,15 +43,24 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long id) {
-        log.info("Deleting user with ID: {}", id);
-        User user = userRepository.findByIdAndDeletedFalse(id)
+        log.info("Soft-deleting user with ID: {}", id);
+
+        // Use findByIdWithNotes to eagerly load notes in a single query.
+        // JOIN FETCH is safe here — it's a single entity, not a paginated list.
+        User user = userRepository.findByIdWithNotes(id)
                 .orElseThrow(() -> {
                     log.warn("Cannot delete user: ID {} not found or already deleted", id);
                     return new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND);
                 });
-        
+
+        // Cascade soft delete: mark all child notes as deleted too.
+        // Because @SQLRestriction filters the notes collection, getNotes() only
+        // returns non-deleted notes — exactly the ones we need to mark.
+        int notesDeleted = user.getNotes().size();
+        user.getNotes().forEach(note -> note.setDeleted(true));
         user.setDeleted(true);
+
         userRepository.save(user);
-        log.info("Successfully manually soft-deleted user with ID: {}", id);
+        log.info("Successfully soft-deleted user ID: {} along with {} note(s)", id, notesDeleted);
     }
 }

@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
+@SQLRestriction("deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,6 +23,7 @@ public class User extends BaseEntity {
     private String name;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @SQLRestriction("deleted = false")
     private List<Note> notes = new ArrayList<>();
 
     public User(String name) {
