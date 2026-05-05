@@ -17,17 +17,20 @@ This roadmap is designed to take this "Notes App" from a simple project to a pro
 - ✅ **Validation:** Using `@Valid` and Jakarta constraints to protect against bad data.
 - ✅ **Global Exception Handling:** Standardizing error responses.
 
-## 🏗 Phase 3: Quality & Visibility (NEXT STEPS)
+## 🏗 Phase 3: Quality & Visibility (COMPLETED)
 - ✅ **Automated Testing:** Learning JUnit 5 and Mockito. (Crucial for job interviews).
 - ✅ **API Documentation:** Implementing Swagger/OpenAPI so you have a UI to test your API.
 - ✅ **Logging:** Adding SLF4J/Logback to see what's happening inside your app while it's running.
 - ✅ **Professional Error Design:** Moving beyond basic strings to structured Error Codes and a consistent API response wrapper.
 
-## 📈 Phase 4: Intermediate Features
+## 📈 Phase 4: Intermediate Features & Architecture Refactoring (NEXT STEPS)
 - ✅ **JPA Auditing:** Automatically tracking `created_at` and `updated_at` for every note.
 - ✅ **Soft Deletes:** Learning how to mark data as "deleted" without actually removing it from the DB.
 - ✅ **Pagination & Sorting:** Handling large amounts of data efficiently.
 - ✅ **Advanced Validation:** Cross-field validation and custom validator annotations.
+- **🚨 Pagination with JOIN FETCH (HIGH PRIORITY):** Removing `JOIN FETCH` from paginated queries to prevent memory leaks (HHH000104).
+- **Cascading Soft Deletes:** Ensuring soft-deleting a parent (User) correctly hides their children (Notes).
+- **Global Soft Delete Filtering:** Replacing manual `findAllByDeletedFalse` with Hibernate `@SQLRestriction` for bulletproof data filtering.
 - **Background Tasks & Cleanup:** Using `@Scheduled` for automatic maintenance (e.g., emptying the trash).
 - **Localization (i18n):** Translating error messages and API responses based on user locale.
 - **API Versioning:** Learning different strategies (URI, Header, Media Type) to evolve your API without breaking clients.
