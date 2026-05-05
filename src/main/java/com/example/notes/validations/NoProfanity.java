@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NoProfanity {
-    String message() default "Content contains inappropriate language";
+    String message() default "{validation.no_profanity}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

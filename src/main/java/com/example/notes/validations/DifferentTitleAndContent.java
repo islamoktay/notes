@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DifferentTitleAndContent {
-    String message() default "Title and Content cannot be identical";
+    String message() default "{validation.note.different_title_content}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

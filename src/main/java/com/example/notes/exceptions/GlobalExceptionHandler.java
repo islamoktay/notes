@@ -1,6 +1,9 @@
 package com.example.notes.exceptions;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -13,16 +16,26 @@ import java.util.Map;
 
 @ControllerAdvice
 @Slf4j
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final MessageSource messageSource;
 
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ApiErrorResponse> handleBaseException(BaseException e) {
         log.warn("Business exception occurred: {} - {}", e.getErrorCode().getCode(), e.getMessage());
         
         ErrorCode errorCode = e.getErrorCode();
+        String localizedMessage = messageSource.getMessage(
+                errorCode.getMessageKey(), 
+                null, 
+                errorCode.getDefaultMessage(), 
+                LocaleContextHolder.getLocale()
+        );
+
         ApiErrorResponse response = ApiErrorResponse.of(
                 errorCode,
-                e.getMessage(),
+                localizedMessage,
                 errorCode.getHttpStatus().value()
         );
         
@@ -41,9 +54,16 @@ public class GlobalExceptionHandler {
         });
 
         ErrorCode errorCode = ErrorCode.VALIDATION_FAILED;
+        String localizedMessage = messageSource.getMessage(
+                errorCode.getMessageKey(), 
+                null, 
+                errorCode.getDefaultMessage(), 
+                LocaleContextHolder.getLocale()
+        );
+
         ApiErrorResponse response = ApiErrorResponse.of(
                 errorCode,
-                errorCode.getDefaultMessage(),
+                localizedMessage,
                 errorCode.getHttpStatus().value(),
                 errors
         );
@@ -56,9 +76,16 @@ public class GlobalExceptionHandler {
         log.warn("Invalid sort field requested: {}", e.getPropertyName());
         
         ErrorCode errorCode = ErrorCode.INVALID_SORT_FIELD;
+        String localizedMessage = messageSource.getMessage(
+                errorCode.getMessageKey(), 
+                new Object[]{e.getPropertyName()}, 
+                String.format("No property '%s' found. Please use a valid sortable field.", e.getPropertyName()), 
+                LocaleContextHolder.getLocale()
+        );
+
         ApiErrorResponse response = ApiErrorResponse.of(
                 errorCode,
-                String.format("No property '%s' found. Please use a valid sortable field.", e.getPropertyName()),
+                localizedMessage,
                 errorCode.getHttpStatus().value()
         );
         
@@ -70,9 +97,16 @@ public class GlobalExceptionHandler {
         log.error("Unhandled exception occurred", e);
         
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        String localizedMessage = messageSource.getMessage(
+                errorCode.getMessageKey(), 
+                null, 
+                errorCode.getDefaultMessage(), 
+                LocaleContextHolder.getLocale()
+        );
+
         ApiErrorResponse response = ApiErrorResponse.of(
                 errorCode,
-                "An internal error occurred. Please contact support if the problem persists.",
+                localizedMessage,
                 errorCode.getHttpStatus().value()
         );
         
