@@ -20,14 +20,16 @@ public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private String firstName;
+    private String lastName;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @SQLRestriction("deleted = false")
     private List<Note> notes = new ArrayList<>();
 
-    public User(String name) {
-        this.name = name;
+    public User(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     // Custom helper method to keep bidirectional relationship in sync

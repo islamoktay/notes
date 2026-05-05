@@ -28,7 +28,7 @@ class AuditingIntegrationTest {
     @DisplayName("Should automatically set createdAt and updatedAt when saving entity")
     void shouldSetAuditingFields() {
         // GIVEN
-        User user = new User("Audit User");
+        User user = new User("Audit", "User");
         user = userRepository.save(user);
 
         Note note = new Note("Audit Title", "Audit Content");

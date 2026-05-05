@@ -46,7 +46,7 @@ class SoftDeleteIntegrationTest {
     @Transactional
     void shouldSoftDeleteNoteManually() {
         // 1. GIVEN: Create a user and a note
-        User user = userRepository.save(new User("Manual Delete User"));
+        User user = userRepository.save(new User("Manual", "Delete User"));
         Note note = new Note("Title", "Content");
         note.setUser(user);
         Note savedNote = noteRepository.save(note);
@@ -76,7 +76,7 @@ class SoftDeleteIntegrationTest {
     @Transactional
     void shouldCascadeSoftDeleteFromUserToNotes() {
         // 1. GIVEN: Create a user with 3 notes
-        User user = new User("Parent User");
+        User user = new User("Parent", "User");
         user.addNote(new Note("Note 1", "Content 1"));
         user.addNote(new Note("Note 2", "Content 2"));
         user.addNote(new Note("Note 3", "Content 3"));

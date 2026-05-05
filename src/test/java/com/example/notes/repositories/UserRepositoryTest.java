@@ -41,7 +41,7 @@ class UserRepositoryTest {
     @DisplayName("Should fetch a user with their notes using findByIdWithNotes (JOIN FETCH)")
     void findByIdWithNotes_Success() {
         // GIVEN: Save a user and a note to the H2 database
-        User user = new User("Jane Doe");
+        User user = new User("Jane", "Doe");
         userRepository.save(user);
 
         Note note = new Note("Secret Note", "This is a secret");
@@ -57,7 +57,7 @@ class UserRepositoryTest {
 
         // THEN: Verify the data was fetched correctly
         assertThat(found).isPresent();
-        assertThat(found.get().getName()).isEqualTo("Jane Doe");
+        assertThat(found.get().getFirstName()).isEqualTo("Jane");
         assertThat(found.get().getNotes()).hasSize(1);
         assertThat(found.get().getNotes().get(0).getTitle()).isEqualTo("Secret Note");
     }
@@ -66,10 +66,10 @@ class UserRepositoryTest {
     @DisplayName("Should auto-filter deleted users via @SQLRestriction")
     void findAll_ShouldExcludeDeletedUsers() {
         // GIVEN: Create two users, soft-delete one
-        User activeUser = new User("Active User");
+        User activeUser = new User("Active", "User");
         userRepository.save(activeUser);
 
-        User deletedUser = new User("Deleted User");
+        User deletedUser = new User("Deleted", "User");
         deletedUser.setDeleted(true);
         userRepository.save(deletedUser);
 
@@ -81,14 +81,14 @@ class UserRepositoryTest {
 
         // THEN: Only the active user should appear — @SQLRestriction filters automatically
         assertThat(usersPage.getContent()).hasSize(1);
-        assertThat(usersPage.getContent().get(0).getName()).isEqualTo("Active User");
+        assertThat(usersPage.getContent().get(0).getFirstName()).isEqualTo("Active");
     }
 
     @Test
     @DisplayName("Should auto-filter deleted notes from a user's collection via @SQLRestriction")
     void findByIdWithNotes_ShouldExcludeDeletedNotes() {
         // GIVEN: Create a user with two notes, soft-delete one note
-        User user = new User("Note Owner");
+        User user = new User("Note", "Owner");
         user.addNote(new Note("Active Note", "Visible content"));
         user.addNote(new Note("Deleted Note", "Hidden content"));
         userRepository.save(user);

@@ -83,7 +83,7 @@ class NoteServiceTest {
     @DisplayName("Should save note successfully when user exists")
     void saveNote_Success() {
         NoteRequest request = new NoteRequest("Title", "Content", 1L);
-        User user = new User("John Doe");
+        User user = new User("John", "Doe");
         user.setId(1L);
 
         given(userRepository.findById(1L)).willReturn(Optional.of(user));

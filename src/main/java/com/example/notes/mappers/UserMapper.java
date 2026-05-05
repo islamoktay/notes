@@ -14,9 +14,14 @@ public class UserMapper {
     public UserResponse toResponse(User user) {
         if (user == null) return null;
 
+        String fullName = user.getFirstName();
+        if (user.getLastName() != null && !user.getLastName().isEmpty()) {
+            fullName += " " + user.getLastName();
+        }
+
         return new UserResponse(
                 user.getId(),
-                user.getName(),
+                fullName,
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );

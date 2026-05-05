@@ -33,7 +33,7 @@ This roadmap is designed to take this "Notes App" from a simple project to a pro
 - ✅ **Global Soft Delete Filtering:** Replaced manual `findAllByDeletedFalse` with Hibernate `@SQLRestriction` for bulletproof data filtering.
 - ✅ **Background Tasks & Cleanup:** Using `@Scheduled` for automatic maintenance (e.g., emptying the trash).
 - ✅ **Localization (i18n):** Translating error messages and API responses based on user locale.
-- **API Versioning:** Learning different strategies (URI, Header, Media Type) to evolve your API without breaking clients.
+- ✅ **API Versioning:** Learning different strategies (URI, Header, Media Type) to evolve your API without breaking clients.
 - ✅ **Advanced Pagination Handling:** Catching `PropertyReferenceException` to return friendly errors for invalid sort fields.
 
 ## 🔒 Phase 5: Security (The Big Leap)
