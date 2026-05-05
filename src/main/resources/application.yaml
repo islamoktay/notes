@@ -24,6 +24,11 @@ spring:
     ansi:
       enabled: ALWAYS
 
+app:
+  cleanup:
+    trash-retention-days: 30
+    cron: "0 0 3 * * ?"
+
 logging:
   level:
     com.example.notes: DEBUG
