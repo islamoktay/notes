@@ -18,4 +18,6 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     @Modifying
     @Query(value = "DELETE FROM notes WHERE deleted = true AND updated_at < :thresholdDate", nativeQuery = true)
     int deleteSoftDeletedNotesOlderThan(@Param("thresholdDate") LocalDateTime thresholdDate);
+
+    java.util.Optional<Note> findByIdAndUserId(Long id, Long userId);
 }

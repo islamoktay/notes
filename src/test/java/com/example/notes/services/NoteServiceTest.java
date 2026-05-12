@@ -5,10 +5,10 @@ import com.example.notes.dtos.NoteResponse;
 import com.example.notes.dtos.PageResponse;
 import com.example.notes.entities.Note;
 import com.example.notes.entities.User;
-import com.example.notes.exceptions.ResourceNotFoundException;
 import com.example.notes.mappers.NoteMapper;
 import com.example.notes.repositories.NoteRepository;
-import com.example.notes.repositories.UserRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,28 +19,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-/**
- * 🎓 Educational Note: Unit Testing with Mockito
- * 
- * In Unit Tests, we want to test a single class (NoteService) in isolation.
- * We don't want to start the database or create real users.
- * 
- * Instead, we "Mock" (fake) the dependencies (Repositories, Mappers).
- * 
- * 🚀 Professional Addition: Domain-Specific Exceptions
- * - We no longer throw generic RuntimeExceptions.
- * - We test for specific custom exceptions like ResourceNotFoundException.
- */
 @ExtendWith(MockitoExtension.class)
 class NoteServiceTest {
 
@@ -48,17 +36,31 @@ class NoteServiceTest {
     private NoteRepository noteRepository;
 
     @Mock
-    private UserRepository userRepository;
-
-    @Mock
     private NoteMapper noteMapper;
 
     @InjectMocks
     private NoteService noteService;
 
+    private User mockUser;
+
+    @BeforeEach
+    void setUp() {
+        mockUser = new User("John", "Doe");
+        mockUser.setId(1L);
+        mockUser.setEmail("john.doe@example.com");
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(mockUser, null, mockUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
     @Test
-    @DisplayName("Should fetch paginated notes successfully")
-    void getNotes_Success() {
+    @DisplayName("Should fetch paginated my notes successfully")
+    void getMyNotes_Success() {
         // GIVEN
         Pageable pageable = PageRequest.of(0, 10);
         Note note = new Note("Title", "Content");
@@ -66,31 +68,27 @@ class NoteServiceTest {
         NoteResponse response = new NoteResponse(1L, "Title", "Content", 1L, null, null);
         PageResponse<NoteResponse> pageResponse = new PageResponse<>(List.of(response), 0, 10, 1, 1, true);
         
-        given(noteRepository.findAll(pageable)).willReturn(notePage);
+        given(noteRepository.findAllByUserId(mockUser.getId(), pageable)).willReturn(notePage);
         given(noteMapper.toResponsePage(notePage)).willReturn(pageResponse);
 
         // WHEN
-        PageResponse<NoteResponse> result = noteService.getNotes(pageable);
+        PageResponse<NoteResponse> result = noteService.getMyNotes(pageable);
 
         // THEN
         assertThat(result.content()).hasSize(1);
         assertThat(result.totalElements()).isEqualTo(1);
-        verify(noteRepository).findAll(pageable);
+        verify(noteRepository).findAllByUserId(mockUser.getId(), pageable);
         verify(noteMapper).toResponsePage(notePage);
     }
 
     @Test
-    @DisplayName("Should save note successfully when user exists")
+    @DisplayName("Should save note successfully")
     void saveNote_Success() {
-        NoteRequest request = new NoteRequest("Title", "Content", 1L);
-        User user = new User("John", "Doe");
-        user.setId(1L);
-
-        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        NoteRequest request = new NoteRequest("Title", "Content");
 
         Note savedNote = new Note("Title", "Content");
         savedNote.setId(1L);
-        savedNote.setUser(user);
+        savedNote.setUser(mockUser);
         NoteResponse response = new NoteResponse(1L, "Title", "Content", 1L, null, null);
 
         given(noteRepository.save(any(Note.class))).willReturn(savedNote);
@@ -101,18 +99,5 @@ class NoteServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.title()).isEqualTo("Title");
         verify(noteRepository).save(any(Note.class));
-    }
-
-    @Test
-    @DisplayName("Should throw ResourceNotFoundException when saving note for non-existing user")
-    void saveNote_UserNotFound() {
-        // GIVEN
-        NoteRequest request = new NoteRequest("Title", "Content", 99L);
-        given(userRepository.findById(99L)).willReturn(Optional.empty());
-
-        // WHEN & THEN
-        assertThatThrownBy(() -> noteService.saveNote(request))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("user was not found");
     }
 }

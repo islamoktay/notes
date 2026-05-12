@@ -3,18 +3,18 @@ package com.example.notes.controllers;
 import com.example.notes.dtos.NoteRequest;
 import com.example.notes.dtos.NoteResponse;
 import com.example.notes.dtos.PageResponse;
-import com.example.notes.exceptions.ErrorCode;
-import com.example.notes.exceptions.ResourceNotFoundException;
 import com.example.notes.services.NoteService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
+import com.example.notes.security.JwtAuthenticationFilter;
 
 import java.util.List;
 
@@ -25,11 +25,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * 🎓 Educational Note: Controller Testing with @WebMvcTest
- */
 @WebMvcTest(NoteController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class NoteControllerTest {
+
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @MockitoBean
+    private org.springframework.security.authentication.AuthenticationProvider authenticationProvider;
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,7 +50,7 @@ class NoteControllerTest {
         // GIVEN
         NoteResponse note = new NoteResponse(1L, "Title", "Content", 1L, null, null);
         PageResponse<NoteResponse> pageResponse = new PageResponse<>(List.of(note), 0, 10, 1, 1, true);
-        given(noteService.getNotes(any(Pageable.class))).willReturn(pageResponse);
+        given(noteService.getMyNotes(any(Pageable.class))).willReturn(pageResponse);
 
         // WHEN & THEN
         mockMvc.perform(get("/api/v1/notes"))
@@ -61,7 +65,7 @@ class NoteControllerTest {
     @DisplayName("Should create note and return wrapped response")
     void saveNote_Success() throws Exception {
         // GIVEN
-        NoteRequest request = new NoteRequest("New Note", "Some content", 1L);
+        NoteRequest request = new NoteRequest("New Note", "Some content");
         NoteResponse response = new NoteResponse(1L, "New Note", "Some content", 1L, null, null);
         
         given(noteService.saveNote(any(NoteRequest.class))).willReturn(response);
@@ -80,7 +84,7 @@ class NoteControllerTest {
     @DisplayName("Should return structured error response when validation fails")
     void saveNote_InvalidData() throws Exception {
         // GIVEN: Request with blank title
-        NoteRequest request = new NoteRequest("", "Some content", 1L);
+        NoteRequest request = new NoteRequest("", "Some content");
 
         // WHEN & THEN
         mockMvc.perform(post("/api/v1/notes")
@@ -89,19 +93,5 @@ class NoteControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_FAILED"))
                 .andExpect(jsonPath("$.errors.title").exists());
-    }
-
-    @Test
-    @DisplayName("Should return structured error response when user is not found")
-    void getUserNotes_UserNotFound() throws Exception {
-        // GIVEN
-        given(noteService.getUserNotes(any(Long.class), any(Pageable.class)))
-                .willThrow(new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
-
-        // WHEN & THEN
-        mockMvc.perform(get("/api/v1/notes/user/99"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.errorCode").value("USER_NOT_FOUND"))
-                .andExpect(jsonPath("$.message").value(ErrorCode.USER_NOT_FOUND.getDefaultMessage()));
     }
 }

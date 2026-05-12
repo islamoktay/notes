@@ -42,6 +42,8 @@ class UserRepositoryTest {
     void findByIdWithNotes_Success() {
         // GIVEN: Save a user and a note to the H2 database
         User user = new User("Jane", "Doe");
+        user.setEmail("jane.doe@example.com");
+        user.setPassword("password");
         userRepository.save(user);
 
         Note note = new Note("Secret Note", "This is a secret");
@@ -67,9 +69,13 @@ class UserRepositoryTest {
     void findAll_ShouldExcludeDeletedUsers() {
         // GIVEN: Create two users, soft-delete one
         User activeUser = new User("Active", "User");
+        activeUser.setEmail("active@example.com");
+        activeUser.setPassword("password");
         userRepository.save(activeUser);
 
         User deletedUser = new User("Deleted", "User");
+        deletedUser.setEmail("deleted@example.com");
+        deletedUser.setPassword("password");
         deletedUser.setDeleted(true);
         userRepository.save(deletedUser);
 
@@ -89,6 +95,8 @@ class UserRepositoryTest {
     void findByIdWithNotes_ShouldExcludeDeletedNotes() {
         // GIVEN: Create a user with two notes, soft-delete one note
         User user = new User("Note", "Owner");
+        user.setEmail("owner@example.com");
+        user.setPassword("password");
         user.addNote(new Note("Active Note", "Visible content"));
         user.addNote(new Note("Deleted Note", "Hidden content"));
         userRepository.save(user);

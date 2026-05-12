@@ -23,4 +23,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query(value = "DELETE FROM users WHERE deleted = true AND updated_at < :thresholdDate", nativeQuery = true)
     int deleteSoftDeletedUsersOlderThan(@Param("thresholdDate") LocalDateTime thresholdDate);
+
+    Optional<User> findByEmail(String email);
 }

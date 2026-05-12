@@ -26,28 +26,16 @@ public class NoteController {
 
     @GetMapping
     @Operation(
-        summary = "Get all notes", 
-        description = "Returns a paginated list of all notes. Sortable fields: id, title, createdAt, updatedAt"
+        summary = "Get my notes", 
+        description = "Returns a paginated list of notes for the authenticated user. Sortable fields: id, title, createdAt, updatedAt"
     )
     public ResponseEntity<ApiResponse<PageResponse<NoteResponse>>> getNotes(@ParameterObject Pageable pageable) {
-        log.info("REST request to get all notes (paginated)");
-        return ResponseEntity.ok(ApiResponse.success(noteService.getNotes(pageable)));
-    }
-
-    @GetMapping("/user/{userId}")
-    @Operation(
-        summary = "Get notes by User ID", 
-        description = "Returns a paginated list of notes for a specific user. Sortable fields: id, title, createdAt, updatedAt"
-    )
-    public ResponseEntity<ApiResponse<PageResponse<NoteResponse>>> getUserNotes(
-            @PathVariable Long userId, 
-            @ParameterObject Pageable pageable) {
-        log.info("REST request to get notes for user: {} (paginated)", userId);
-        return ResponseEntity.ok(ApiResponse.success(noteService.getUserNotes(userId, pageable)));
+        log.info("REST request to get my notes (paginated)");
+        return ResponseEntity.ok(ApiResponse.success(noteService.getMyNotes(pageable)));
     }
 
     @PostMapping
-    @Operation(summary = "Create a new note", description = "Saves a new note and connects it to a user")
+    @Operation(summary = "Create a new note", description = "Saves a new note for the authenticated user")
     public ResponseEntity<ApiResponse<NoteResponse>> saveNote(@Valid @RequestBody NoteRequest noteRequest) {
         log.info("REST request to save note: {}", noteRequest.title());
         NoteResponse savedNote = noteService.saveNote(noteRequest);
@@ -56,7 +44,7 @@ public class NoteController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a note", description = "Performs a soft delete on a note")
+    @Operation(summary = "Delete a note", description = "Performs a soft delete on a note owned by the authenticated user")
     public ResponseEntity<ApiResponse<Void>> deleteNote(@PathVariable Long id) {
         log.info("REST request to delete note: {}", id);
         noteService.deleteNote(id);

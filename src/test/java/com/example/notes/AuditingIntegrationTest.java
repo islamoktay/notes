@@ -29,6 +29,8 @@ class AuditingIntegrationTest {
     void shouldSetAuditingFields() {
         // GIVEN
         User user = new User("Audit", "User");
+        user.setEmail("audit@example.com");
+        user.setPassword("password");
         user = userRepository.save(user);
 
         Note note = new Note("Audit Title", "Audit Content");

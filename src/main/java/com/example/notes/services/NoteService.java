@@ -9,11 +9,11 @@ import com.example.notes.exceptions.ErrorCode;
 import com.example.notes.exceptions.ResourceNotFoundException;
 import com.example.notes.mappers.NoteMapper;
 import com.example.notes.repositories.NoteRepository;
-import com.example.notes.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,35 +23,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class NoteService {
     private final NoteRepository noteRepository;
-    private final UserRepository userRepository;
     private final NoteMapper noteMapper;
 
-    public PageResponse<NoteResponse> getNotes(Pageable pageable) {
-        log.info("Fetching paginated active notes from database");
-        Page<Note> notePage = noteRepository.findAll(pageable);
-        return noteMapper.toResponsePage(notePage);
+    private User getCurrentUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    public PageResponse<NoteResponse> getUserNotes(Long userId, Pageable pageable) {
-        log.info("Fetching paginated active notes for user ID: {}", userId);
-        
-        if (!userRepository.existsById(userId)) {
-            log.warn("Attempted to fetch notes for non-existing or deleted user ID: {}", userId);
-            throw new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND);
-        }
-
-        Page<Note> notePage = noteRepository.findAllByUserId(userId, pageable);
+    public PageResponse<NoteResponse> getMyNotes(Pageable pageable) {
+        User user = getCurrentUser();
+        log.info("Fetching paginated active notes for user ID: {}", user.getId());
+        Page<Note> notePage = noteRepository.findAllByUserId(user.getId(), pageable);
         return noteMapper.toResponsePage(notePage);
     }
 
     @Transactional
     public NoteResponse saveNote(NoteRequest request) {
-        log.info("Saving new note for user ID: {}", request.userId());
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> {
-                    log.warn("Cannot save note: User ID {} not found or deleted", request.userId());
-                    return new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND);
-                });
+        User user = getCurrentUser();
+        log.info("Saving new note for user ID: {}", user.getId());
 
         Note note = new Note(request.title(), request.content());
         note.setUser(user);
@@ -63,10 +51,11 @@ public class NoteService {
 
     @Transactional
     public void deleteNote(Long id) {
-        log.info("Deleting note with ID: {}", id);
-        Note note = noteRepository.findById(id)
+        User user = getCurrentUser();
+        log.info("User {} attempting to delete note with ID: {}", user.getId(), id);
+        Note note = noteRepository.findByIdAndUserId(id, user.getId())
                 .orElseThrow(() -> {
-                    log.warn("Cannot delete note: ID {} not found or already deleted", id);
+                    log.warn("Cannot delete note: ID {} not found, already deleted, or belongs to another user", id);
                     return new ResourceNotFoundException(ErrorCode.NOTE_NOT_FOUND);
                 });
         

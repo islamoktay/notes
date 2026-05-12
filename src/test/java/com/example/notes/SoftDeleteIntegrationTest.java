@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -46,7 +48,15 @@ class SoftDeleteIntegrationTest {
     @Transactional
     void shouldSoftDeleteNoteManually() {
         // 1. GIVEN: Create a user and a note
-        User user = userRepository.save(new User("Manual", "Delete User"));
+        User user = new User("Manual", "Delete User");
+        user.setEmail("manual.delete@example.com");
+        user.setPassword("password");
+        user = userRepository.save(user);
+
+        // Mock Security Context
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
         Note note = new Note("Title", "Content");
         note.setUser(user);
         Note savedNote = noteRepository.save(note);
@@ -77,6 +87,8 @@ class SoftDeleteIntegrationTest {
     void shouldCascadeSoftDeleteFromUserToNotes() {
         // 1. GIVEN: Create a user with 3 notes
         User user = new User("Parent", "User");
+        user.setEmail("parent.user@example.com");
+        user.setPassword("password");
         user.addNote(new Note("Note 1", "Content 1"));
         user.addNote(new Note("Note 2", "Content 2"));
         user.addNote(new Note("Note 3", "Content 3"));
